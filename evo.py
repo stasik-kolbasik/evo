@@ -13,9 +13,11 @@ class Food():
 
     def draw(self):
         pygame.draw.circle(self.screen, self.colour, [int(self.x), int(self.y)], self.size)
+    def undraw(self):
+        pygame.draw.circle(self.screen, black, [int(self.x), int(self.y)], self.size)
 
 
-gen = {'speed': 30, 'maxenergy': 1000, 'mutationrate': 0.5, 'mutationvalue': 0.2, 'increasemutationrate':0.5, 'sensepower': 5, 'size': 7}
+gen = {'speed': 30, 'maxenergy': 1000, 'mutationrate': 0.3, 'mutationvalue': 0.6, 'increasemutationrate':0.5, 'sensepower': 5, 'size': 7, 'lifecycle':200}
 
 class Animal():
     def __init__(self, x, y, gen, fps, screen, screensize, colour = (0, 0, 255)):
@@ -29,32 +31,34 @@ class Animal():
         self.size = gen['size']
         self.colour = colour
         self.screensize = screensize
-        self.maxenergy = gen['maxenergy']
+        self.maxenergy = gen['maxenergy'] * gen['size']
         self.speed = gen['speed']
         self.energy = self.maxenergy//2
         self.sensepower = gen['sensepower'] * self.size
+        self.lifecycle = (gen['lifecycle'] * fps * self.maxenergy) / self.speed
 
-
-    def draw(self):
-        pygame.draw.circle(self.screen, self.colour, [int(self.x), int(self.y)], int(self.size))
-        pygame.draw.circle(self.screen, (0,0,0), [int(self.x + self.xdir), int(self.y+self.ydir)], 1)
+    def draw(self, colour = (0, 0, 255)):
+        pygame.draw.circle(self.screen, colour, [int(self.x), int(self.y)], int(self.size))
+#        pygame.draw.circle(self.screen, (0,0,0), [int(self.x + self.xdir), int(self.y+self.ydir)], 1)
 
 
     def move(self):
         self.x += self.xdir / self.fps * self.speed
         self.y += self.ydir / self.fps * self.speed
-        self.energy -= self.speed * 5 / self.fps
+        self.draw()
+        self.energy -= self.speed * 10 / self.fps
         self.energy -= (self.size ** 2)/self.fps
+        self.lifecycle -= 1
 
     def boundaries(self):
         if self.x + self.size> self.screensize[0]:
-            self.x = self.screensize[0] - self.size
+            self.x = self.screensize[0] - self.size + 1
         if self.x < self.size:
-            self.x = self.size
+            self.x = self.size - 1
         if self.y + self.size> self.screensize[1]:
-            self.y = self.screensize[1] - self.size
+            self.y = self.screensize[1] - self.size + 1
         if self.y < self.size:
-            self.y = self.size
+            self.y = self.size - 1
 
     def death(self):
         newfood = []
@@ -84,7 +88,7 @@ class Animal():
         x = 0
         y = 0
         for k in list:
-            skvdist = dist(self, k) ** 2
+            skvdist = dist(self, k) ** 2  + 0.000000001
             x += (k.x - self.x) / skvdist
             y += (k.y - self.y) / skvdist
         self.energy -= (self.gen['sensepower'] ** 2 )/fps
@@ -135,7 +139,8 @@ class Animal():
         self.move()
         self.boundaries()
         eaten = self.eat(farr)
-        self.draw()
+
+
 
 def checkbirth(aarr):
     newanimals = []
@@ -145,7 +150,7 @@ def checkbirth(aarr):
     return newanimals
 
 def makefood(size, screen):
-    return Food(random.randint(1, int(size[0]) - 1), random.randint(1, int(size[1]) - 1), screen)
+    return Food(random.randint(0, int(size[0]) ), random.randint(0, int(size[1]) ), screen)
 
 def dist(a, b):
     return ((a.x - b.x)**2 + (a.y - b.y)**2)**0.5
@@ -154,13 +159,20 @@ def checkdeath(aarr):
     nf = []
     deathlist = []
     for i in range(len(aarr)):
-        if aarr[i].energy<=0:
+        if aarr[i].energy <= 0 or aarr[i].lifecycle <= 0:
             deathlist.append(i)
             
     for k in range(len(deathlist) - 1, -1, -1):
         flist = (aarr.pop(deathlist[k])).death()
         nf+=flist
     return nf
+
+def average(dict, name):
+    a = 0
+    for i in dict:
+        a+= i.gen[name]
+    return a / len(dict)
+
 
 
 if __name__ == "__main__":
@@ -170,6 +182,8 @@ if __name__ == "__main__":
     screen = pygame.display.set_mode(screensize)
     clock = pygame.time.Clock()
     done = False
+
+    l = 0
 
     # food array
     farr = []
@@ -193,15 +207,22 @@ if __name__ == "__main__":
 
         if timer % int(fps / 30) == 0:
             farr.append(makefood(screensize, screen))
-        if timer % int(fps / 30) == 0:
-            farr.append(makefood(screensize, screen))
+       # if timer % int(fps / 30) == 0:
+        #    farr.append(makefood(screensize, screen))
+        #if timer % int(fps / 30) == 0:
+         #   farr.append(makefood(screensize, screen))
 
         timer += 1
 
+        if len(aarr) != l:
+            l = len(aarr)
+            if l !=0:
+                print(l, average(aarr, 'maxenergy'), average(aarr, 'lifecycle'), average(aarr, 'speed'), average(aarr, 'sensepower'))
+            else:
+                print(0)
         farr += checkdeath(aarr)
         aarr += checkbirth(aarr)
         for i in aarr:
-            print(i.energy)
             i.total(farr, aarr)
 
         for i in farr:
