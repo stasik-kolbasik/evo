@@ -18,6 +18,7 @@ class Food():
 
 
 gen = {'speed': 15, 'maxenergy': 1000, 'mutationrate': 0.5, 'mutationvalue': 0.6, 'increasemutationrate':0.5, 'sensepower': 10, 'size': 2, 'lifecycle':200}
+gen1 = {'speed': 30, 'maxenergy': 1000, 'mutationrate': 0.5, 'mutationvalue': 0.6, 'increasemutationrate':0.5, 'sensepower': 5, 'size': 7, 'lifecycle':200}
 
 class Animal():
     def __init__(self, x, y, gen, fps, screen, screensize, colour = (0, 0, 255)):
@@ -105,29 +106,29 @@ class Animal():
         genom = {}
         for a in gen.keys():
             if a!= 'mutationrate' and a!= 'increasemutationrate':
-                if random.random()< gen['mutationrate']:
-                    if random.random()<gen['increasemutationrate']:
-                        genom[a] = gen[a] * (1 + gen['mutationvalue'])
+                if random.random()< self.gen['mutationrate']:
+                    if random.random()<self.gen['increasemutationrate']:
+                        genom[a] = self.gen[a] * (1 + self.gen['mutationvalue'])
                     else:
-                        genom[a] = gen[a] * (1 - gen['mutationvalue'])
+                        genom[a] = self.gen[a] * (1 - self.gen['mutationvalue'])
                 else:
-                    genom[a] = gen[a]
+                    genom[a] = self.gen[a]
             elif a == 'mutationrate':
-                if random.random()< gen['mutationrate']:
-                    if random.random()< gen['increasemutationrate']:
-                        genom[a] = gen[a] * (1+gen['mutationrate']) / (gen[a] * 2)
+                if random.random()< self.gen['mutationrate']:
+                    if random.random()< self.gen['increasemutationrate']:
+                        genom[a] = self.gen[a] * (1+self.gen['mutationrate']) / (self.gen[a] * 2)
                     else:
-                        genom[a] = (1 - gen[a]) * (gen['mutationrate']) / ((1 - gen[a]) * 2)
+                        genom[a] = (1 - self.gen[a]) * (self.gen['mutationrate']) / ((1 - self.gen[a]) * 2)
                 else:
-                    genom[a] = gen[a]
+                    genom[a] = self.gen[a]
             else:
-                if random.random()< gen['mutationrate']:
-                    if random.random()< gen['increasemutationrate']:
-                        genom[a] = gen[a] * (1+gen[a]) / (gen[a] * 2)
+                if random.random()< self.gen['mutationrate']:
+                    if random.random()< self.gen['increasemutationrate']:
+                        genom[a] = self.gen[a] * (1+self.gen[a]) / (self.gen[a] * 2)
                     else:
-                        genom[a] = (1 - gen[a]) * (gen[a]) / ((1 - gen[a]) * 2)
+                        genom[a] = (1 - self.gen[a]) * (self.gen[a]) / ((1 - self.gen[a]) * 2)
                 else:
-                    genom[a] = gen[a]
+                    genom[a] = self.gen[a]
         animal = Animal(self.x + 2 * self.size, self.y + 2 * self.size, genom, fps, screen, screensize, colour = (0, 0, 255))
         self.energy = self.maxenergy//2
         return animal
@@ -193,7 +194,7 @@ if __name__ == "__main__":
 
     timer = 0
     aarr.append(Animal(860, 320, gen, fps, screen, screensize))
-    aarr.append(Animal(1910, 320, gen, fps, screen, screensize))
+    aarr.append(Animal(1910, 320, gen1, fps, screen, screensize))
 
     black = (0, 0, 0)
     for i in range(1000):
