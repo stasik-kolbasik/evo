@@ -17,7 +17,7 @@ class Food():
         pygame.draw.circle(self.screen, black, [int(self.x), int(self.y)], self.size)
 
 
-gen = {'speed': 30, 'maxenergy': 1000, 'mutationrate': 0.3, 'mutationvalue': 0.6, 'increasemutationrate':0.5, 'sensepower': 5, 'size': 7, 'lifecycle':200}
+gen = {'speed': 15, 'maxenergy': 1000, 'mutationrate': 0.5, 'mutationvalue': 0.6, 'increasemutationrate':0.5, 'sensepower': 10, 'size': 2, 'lifecycle':200}
 
 class Animal():
     def __init__(self, x, y, gen, fps, screen, screensize, colour = (0, 0, 255)):
@@ -145,7 +145,7 @@ class Animal():
 def checkbirth(aarr):
     newanimals = []
     for i in aarr:
-        if i.energy>=i.maxenergy * 0.9:
+        if i.energy>=i.maxenergy * 0.7:
             newanimals.append(i.breed())
     return newanimals
 
@@ -217,7 +217,7 @@ if __name__ == "__main__":
         if len(aarr) != l:
             l = len(aarr)
             if l !=0:
-                print(l, average(aarr, 'maxenergy'), average(aarr, 'lifecycle'), average(aarr, 'speed'), average(aarr, 'sensepower'))
+                print(l, 'maxenergy', average(aarr, 'maxenergy'), 'lifecycle', average(aarr, 'lifecycle'), 'speed', average(aarr, 'speed'), 'sensepower', average(aarr, 'sensepower'), 'size', average(aarr, 'size'))
             else:
                 print(0)
         farr += checkdeath(aarr)
@@ -230,7 +230,7 @@ if __name__ == "__main__":
 
         pygame.display.flip()
         screen.fill(black)
-        clock.tick(fps)
+       # clock.tick(fps)
 
     pygame.quit()
 
