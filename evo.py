@@ -18,8 +18,8 @@ class Food():
         pygame.draw.circle(self.screen, black, [int(self.x), int(self.y)], self.size)
 
 
-gen = {'speed': 15, 'maxenergy': 1000, 'mutationrate': 0.3, 'mutationvalue': 0.2, 'increasemutationrate':0.5, 'sensepower': 10, 'size': 2, 'lifecycle':200}
-gen1 = {'speed': 30, 'maxenergy': 1000, 'mutationrate': 0.3, 'mutationvalue': 0.2, 'increasemutationrate':0.5, 'sensepower': 5, 'size': 7, 'lifecycle':200}
+gen = {'speed': 15, 'maxenergy': 1000, 'mutationrate': 0.5, 'mutationvalue': 0.2, 'increasemutationrate':0.5, 'sensepower': 10, 'size': 2, 'lifecycle':200}
+gen1 = gen
 
 class Animal():
     def __init__(self, x, y, gen, fps, screen, screensize, colour = (0, 0, 255)):
@@ -40,13 +40,14 @@ class Animal():
         self.lifecycle = (gen['lifecycle'] * fps * self.maxenergy) / self.speed
 
     def draw(self, colour = (0, 0, 255)):
-        pygame.draw.circle(self.screen, colour, [int(self.x), int(self.y)], int(self.size))
+        pygame.draw.circle(self.screen, colour, [int(self.x), int(self.y)], max(0, int(self.size)))
 #        pygame.draw.circle(self.screen, (0,0,0), [int(self.x + self.xdir), int(self.y+self.ydir)], 1)
 
 
     def move(self):
         self.x += self.xdir / self.fps * self.speed
         self.y += self.ydir / self.fps * self.speed
+        self.boundaries()
         self.draw()
         self.energy -= self.speed * 10 / self.fps
         self.energy -= ( 3 * self.size ** 2)/self.fps
@@ -69,6 +70,7 @@ class Animal():
             food.x+=self.x
             food.y+=self.y
             newfood.append(food)
+        self.draw(black)
         return newfood
 
 
@@ -132,7 +134,7 @@ class Animal():
                 else:
                     genom[a] = self.gen[a]
         animal = Animal(self.x + 2 * self.size, self.y + 2 * self.size, genom, fps, screen, screensize, colour = (0, 0, 255))
-        self.energy = self.maxenergy//2
+        self.energy = self.maxenergy//3
         return animal
 
 
@@ -141,7 +143,6 @@ class Animal():
         self.draw(black)
         self.turn(farr)
         self.move()
-        self.boundaries()
         eaten = self.eat(farr)
 
 
@@ -181,7 +182,7 @@ def average(dict, name):
 
 if __name__ == "__main__":
     screensize = (1280, 640)
-    fps = 30
+    fps = 60
     pygame.init()
     screen = pygame.display.set_mode(screensize)
     clock = pygame.time.Clock()
