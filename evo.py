@@ -13,12 +13,13 @@ class Food():
 
     def draw(self):
         pygame.draw.circle(self.screen, self.colour, [int(self.x), int(self.y)], self.size)
+
     def undraw(self):
         pygame.draw.circle(self.screen, black, [int(self.x), int(self.y)], self.size)
 
 
-gen = {'speed': 15, 'maxenergy': 1000, 'mutationrate': 0.5, 'mutationvalue': 0.6, 'increasemutationrate':0.5, 'sensepower': 10, 'size': 2, 'lifecycle':200}
-gen1 = {'speed': 30, 'maxenergy': 1000, 'mutationrate': 0.5, 'mutationvalue': 0.6, 'increasemutationrate':0.5, 'sensepower': 5, 'size': 7, 'lifecycle':200}
+gen = {'speed': 15, 'maxenergy': 1000, 'mutationrate': 0.3, 'mutationvalue': 0.2, 'increasemutationrate':0.5, 'sensepower': 10, 'size': 2, 'lifecycle':200}
+gen1 = {'speed': 30, 'maxenergy': 1000, 'mutationrate': 0.3, 'mutationvalue': 0.2, 'increasemutationrate':0.5, 'sensepower': 5, 'size': 7, 'lifecycle':200}
 
 class Animal():
     def __init__(self, x, y, gen, fps, screen, screensize, colour = (0, 0, 255)):
@@ -48,7 +49,7 @@ class Animal():
         self.y += self.ydir / self.fps * self.speed
         self.draw()
         self.energy -= self.speed * 10 / self.fps
-        self.energy -= (self.size ** 2)/self.fps
+        self.energy -= ( 3 * self.size ** 2)/self.fps
         self.lifecycle -= 1
 
     def boundaries(self):
@@ -79,6 +80,7 @@ class Animal():
                 eaten.append(i)
                 self.energy +=50
         for k in eaten:
+            arr[k].undraw()
             arr.pop(k)
 
     def sensefood(self, farr):
@@ -136,6 +138,7 @@ class Animal():
 
     # Execute animal actions on next move
     def total(self, farr, aarr):
+        self.draw(black)
         self.turn(farr)
         self.move()
         self.boundaries()
@@ -230,7 +233,7 @@ if __name__ == "__main__":
             i.draw()
 
         pygame.display.flip()
-        screen.fill(black)
+        #screen.fill(black)
        # clock.tick(fps)
 
     pygame.quit()
