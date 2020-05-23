@@ -18,7 +18,7 @@ class Food():
         pygame.draw.circle(self.screen, black, [int(self.x), int(self.y)], self.size)
 
 
-gen = {'speed': 15, 'maxenergy': 1000, 'mutationrate': 0.5, 'mutationvalue': 0.2, 'increasemutationrate':0.5, 'sensepower': 10, 'size': 2, 'lifecycle':200}
+gen = {'speed': 20, 'maxenergy': 1000, 'mutationrate': 0.2, 'mutationvalue': 0.2, 'increasemutationrate': 0.5, 'sensepower': 5, 'size': 4, 'lifecycle':200}
 gen1 = gen
 
 class Animal():
@@ -50,7 +50,7 @@ class Animal():
         self.boundaries()
         self.draw()
         self.energy -= self.speed * 10 / self.fps
-        self.energy -= ( 3 * self.size ** 2)/self.fps
+        self.energy -= ( self.size ** 2.5)/self.fps
         self.lifecycle -= 1
 
     def boundaries(self):
@@ -66,7 +66,7 @@ class Animal():
     def death(self):
         newfood = []
         for i in range(int(self.maxenergy / 100)):
-            food = (makefood([self.size,self.size], screen))
+            food = (makefood([self.size * 0.8, self.size * 0.8], screen))
             food.x+=self.x
             food.y+=self.y
             newfood.append(food)
@@ -120,9 +120,9 @@ class Animal():
             elif a == 'mutationrate':
                 if random.random()< self.gen['mutationrate']:
                     if random.random()< self.gen['increasemutationrate']:
-                        genom[a] = self.gen[a] * (1+self.gen['mutationrate']) / (self.gen[a] * 2)
+                        genom[a] = self.gen[a] * (1+self.gen['mutationvalue']) / (self.gen[a] * 2)
                     else:
-                        genom[a] = (1 - self.gen[a]) * (self.gen['mutationrate']) / ((1 - self.gen[a]) * 2)
+                        genom[a] = (1 - self.gen[a]) * (self.gen['mutationvalue']) / ((1 - self.gen[a]) * 2)
                 else:
                     genom[a] = self.gen[a]
             else:
@@ -150,12 +150,12 @@ class Animal():
 def checkbirth(aarr):
     newanimals = []
     for i in aarr:
-        if i.energy>=i.maxenergy * 0.7:
+        if i.energy>=i.maxenergy * 0.9:
             newanimals.append(i.breed())
     return newanimals
 
 def makefood(size, screen):
-    return Food(random.randint(0, int(size[0]) ), random.randint(0, int(size[1]) ), screen)
+    return Food(random.randint(0, max(0, int(size[0])) ), random.randint(0, max(0, int(size[1])) ), screen)
 
 def dist(a, b):
     return ((a.x - b.x)**2 + (a.y - b.y)**2)**0.5
@@ -182,7 +182,7 @@ def average(dict, name):
 
 if __name__ == "__main__":
     screensize = (1280, 640)
-    fps = 60
+    fps = 30
     pygame.init()
     screen = pygame.display.set_mode(screensize)
     clock = pygame.time.Clock()
@@ -200,6 +200,8 @@ if __name__ == "__main__":
     aarr.append(Animal(860, 320, gen, fps, screen, screensize))
     aarr.append(Animal(1910, 320, gen1, fps, screen, screensize))
 
+    extinctioncounter = 0
+
     black = (0, 0, 0)
     for i in range(1000):
         farr.append(makefood(screensize, screen))
@@ -212,8 +214,7 @@ if __name__ == "__main__":
 
         if timer % int(fps / 30) == 0:
             farr.append(makefood(screensize, screen))
-       # if timer % int(fps / 30) == 0:
-        #    farr.append(makefood(screensize, screen))
+            farr.append(makefood(screensize, screen))
         #if timer % int(fps / 30) == 0:
          #   farr.append(makefood(screensize, screen))
 
@@ -222,9 +223,11 @@ if __name__ == "__main__":
         if len(aarr) != l:
             l = len(aarr)
             if l !=0:
-                print(l, 'maxenergy', average(aarr, 'maxenergy'), 'lifecycle', average(aarr, 'lifecycle'), 'speed', average(aarr, 'speed'), 'sensepower', average(aarr, 'sensepower'), 'size', average(aarr, 'size'))
+                print(extinctioncounter, l,'mutation rate', average(aarr, 'mutationrate'), 'mutationvalue', average(aarr, 'mutationvalue'), 'maxenergy', average(aarr, 'maxenergy'), 'lifecycle', average(aarr, 'lifecycle'), 'speed', average(aarr, 'speed'), 'sensepower', average(aarr, 'sensepower'), 'size', average(aarr, 'size'))
             else:
                 print(0)
+                extinctioncounter += 1
+                aarr.append(Animal(860, 320, gen, fps, screen, screensize))
         farr += checkdeath(aarr)
         aarr += checkbirth(aarr)
         for i in aarr:
